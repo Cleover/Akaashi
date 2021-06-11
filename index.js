@@ -1,8 +1,5 @@
-const modules = "./modules/";
-
 const fs = require("fs");
 const Discord = require('discord.js');
-require("dotenv").config()
 
 const client = new Discord.Client({
   intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MESSAGES', 'GUILD_MEMBERS', 'GUILD_MESSAGE_REACTIONS', 'DIRECT_MESSAGES'],
@@ -10,6 +7,7 @@ const client = new Discord.Client({
 });
 
 require('./utils/functions')(client);
+require("dotenv").config()
 
 client.mongoose = require('./utils/mongoose');
 
@@ -28,20 +26,18 @@ fs.readdir("./events/", (err, files) => {
   });
 });
 
-fs.readdirSync(modules).forEach(file => {
-  fs.readdir(`./modules/${file}/`, (err, files) => {
-    if (err) return console.error(err);
-
-    let jsFile = files.filter(f => f.split(".").pop() === "js");
-    if (jsFile.length <= 0) {
-      return console.log("Couldn't find any commands.");
-    }
-    jsFile.forEach(f => {
-      let pull = require(`./modules/${file}/${f}`);
-      client.commands.set(pull.data.name, pull);
-    });
+fs.readdir("./commands/", (err, files) => {
+  if (err) return console.error(err);
+  files.forEach(f => {
+    let commandName = f.split(".")[0];
+    let pull = require(`./commands/${commandName}`);
+    client.commands.set(pull.data.name, pull);
   });
 });
+
+
+
+
 
 client.mongoose.init();
 

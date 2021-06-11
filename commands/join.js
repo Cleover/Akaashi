@@ -3,7 +3,6 @@ const {
     MessageButton,
     MessageEmbed
 } = require('discord.js');
-const interaction = require('../../events/interaction');
 
 exports.run = async (client, message, settings) => {
 
