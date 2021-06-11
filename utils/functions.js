@@ -132,14 +132,14 @@ module.exports = client => {
 
 
         data.then(function (result) {
-
             if (result) {
                 result.forEach(element => {
-                    if (!arr.length == 25) {
-                        arr.push({
+                    if (arr.length != 25) {
+                        let subteamData = {
                             name: element.name,
                             value: element.owner
-                        })
+                        }
+                        arr.push(subteamData)
                     }
                 });
             }
@@ -356,7 +356,6 @@ module.exports = client => {
             }
 
             const command = client.guilds.cache.get(process.env.DISCORD)?.commands.create(data);
-
         })
 
 
