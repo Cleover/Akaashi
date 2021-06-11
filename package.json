@@ -1,0 +1,19 @@
+{
+    "name": "akaashi",
+    "version": "0.1.0",
+    "description": "Akaashi (Terushima Beta Bot)",
+    "main": "node index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "engines": {
+        "node": "16.x"
+    },
+    "author": "Kamiko",
+    "license": "MIT",
+    "dependencies": {
+        "discord.js": "^13.0.0-dev.f5f3f772865ee98bbb44df938e0e71f9f8865c10",
+        "dotenv": "^10.0.0",
+        "mongoose": "^5.12.12"
+    }
+}
