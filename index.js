@@ -36,9 +36,6 @@ fs.readdir("./commands/", (err, files) => {
 });
 
 
-
-
-
 client.mongoose.init();
 
 client.login(process.env.TOKEN);

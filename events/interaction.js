@@ -166,7 +166,7 @@ module.exports = async (client, interaction) => {
                             // If they have reached the join limit tell the creator that it was accepted but they have reached the limit
                             if (numberOfSubteams >= joinLimit) return Error(client, "Creation", createdBy, process.env.JOIN, "Your request to make a subteam was accepted. However, since you have hit the subteam join limit. Please leave a subteam and re-submit your request. You can also subscribe to our [Patreon](https://www.patreon.com/dwain) to increase your join limit.")
 
-                            if (!(tier2 || tier3)) return Error(client, "Creation", createdBy, process.env.JOIN, "Your request to create a subteam was accepted. However, you are no longer a Patron of Tier 2 or Tier 3. Please consider resubscribing and resubmit a request to make a subteam.")
+                            if (!(tier2 || tier3)) return Error(client, "Creation", createdBy, process.env.JOIN, "Your request to create a subteam was accept. However, you are no longer a Patron of Tier 2 or Tier 3. Please consider resubscribing and resubmit a request to make a subteam.")
 
                             let usersSubteam = client.getSubteamByUser(createdBy)
 
