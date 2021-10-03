@@ -13,11 +13,11 @@ exports.run = async (client, message, settings) => {
 
         const row = new MessageActionRow()
             .addComponents(new MessageButton()
-                .setCustomID(`STD|Y|${result[0].owner}|${result[0].name}|1`)
+                .setCustomId(`STD|Y|${result[0].owner}|${result[0].name}|1`)
                 .setLabel('YES')
                 .setStyle('DANGER'));
         row.addComponents(new MessageButton()
-            .setCustomID(`STD|N|${result[0].owner}|${result[0].name}`)
+            .setCustomId(`STD|N|${result[0].owner}|${result[0].name}`)
             .setLabel('NO')
             .setStyle('SUCCESS'));
 

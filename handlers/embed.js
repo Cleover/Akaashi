@@ -9,8 +9,13 @@ function Error(client, type, user, channel, message) {
         .setColor("#f7cba6")
         .setDescription(`<@${user}>, ${message}`)
 
-    return client.channels.cache.get(channel).send(`<@${user}>`, embed);
+    return client.channels.cache.get(channel).send({
+        content: `<@${user}>`,
+        embeds: [embed]
+    });
+
 }
+
 
 function Accepted(user, channel, message) {
     const embed = new MessageEmbed()
@@ -18,7 +23,11 @@ function Accepted(user, channel, message) {
         .setColor("#f7cba6")
         .setDescription(`<@${user}>, ${message}`)
 
-    return channel.send(`<@${user}>`, embed);
+    return channel.send({
+        content: `<@${user}>`,
+        embeds: [embed]
+    });
+
 }
 
 function Denied(client, user, channel, message) {
@@ -27,7 +36,11 @@ function Denied(client, user, channel, message) {
         .setColor("#f7cba6")
         .setDescription(`<@${user}>, ${message}`)
 
-    return client.channels.cache.get(channel).send(`<@${user}>`, embed);
+    return client.channels.cache.get(channel).send({
+        content: `<@${user}>`,
+        embeds: [embed]
+    });
+
 }
 
 
@@ -37,7 +50,11 @@ function Edited(client, user, channel, message) {
         .setColor("#f7cba6")
         .setDescription(`<@${user}>, ${message}`)
 
-    return client.channels.cache.get(channel).send(`<@${user}>`, embed);
+    return client.channels.cache.get(channel).send({
+        content: `<@${user}>`,
+        embeds: [embed]
+    });
+
 }
 
 function EditDenied(client, user, channel, message) {
@@ -46,7 +63,11 @@ function EditDenied(client, user, channel, message) {
         .setColor("#f7cba6")
         .setDescription(`<@${user}>, ${message}`)
 
-    return client.channels.cache.get(channel).send(`<@${user}>`, embed);
+    return client.channels.cache.get(channel).send({
+        content: `<@${user}>`,
+        embeds: [embed]
+    });
+
 }
 
 function JoinAccept(client, user, channel, message) {
@@ -55,7 +76,11 @@ function JoinAccept(client, user, channel, message) {
         .setColor("#f7cba6")
         .setDescription(`<@${user}>, ${message}`)
 
-    return client.channels.cache.get(channel).send(`<@${user}>`, embed);
+    return client.channels.cache.get(channel).send({
+        content: `<@${user}>`,
+        embeds: [embed]
+    });
+
 }
 
 function JoinDeny(client, user, channel, message) {
@@ -64,7 +89,11 @@ function JoinDeny(client, user, channel, message) {
         .setColor("#f7cba6")
         .setDescription(`<@${user}>, ${message}`)
 
-    return client.channels.cache.get(channel).send(`<@${user}>`, embed);
+    return client.channels.cache.get(channel).send({
+        content: `<@${user}>`,
+        embeds: [embed]
+    });
+
 }
 
 function JoinAccept(client, user, channel, message) {
@@ -73,7 +102,11 @@ function JoinAccept(client, user, channel, message) {
         .setColor("#f7cba6")
         .setDescription(`<@${user}>, ${message}`)
 
-    return client.channels.cache.get(channel).send(`<@${user}>`, embed);
+    return client.channels.cache.get(channel).send({
+        content: `<@${user}>`,
+        embeds: [embed]
+    });
+
 }
 
 function JoinError(client, user, channel, message) {
@@ -82,7 +115,11 @@ function JoinError(client, user, channel, message) {
         .setColor("#f7cba6")
         .setDescription(`<@${user}>, ${message}`)
 
-    return client.channels.cache.get(channel).send(`<@${user}>`, embed);
+    return client.channels.cache.get(channel).send({
+        content: `<@${user}>`,
+        embeds: [embed]
+    });
+
 }
 
 module.exports = {

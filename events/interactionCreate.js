@@ -31,16 +31,16 @@ module.exports = async (client, interaction) => {
     // Check if its a command 
     if (interaction.isCommand()) {
 
-        const cmd = client.commands.get(`${interaction.options[0].name}`)
+        const cmd = client.commands.get(`${interaction.options._subcommand}`)
         if (!cmd) return;
-        cmd.run(client, interaction, interaction.options);
+        cmd.run(client, interaction, interaction.options._hoistedOptions);
     }
 
     // Check if its a button
     if (interaction.isMessageComponent() && interaction.componentType == 'BUTTON') {
 
         // Get the buttons id
-        let buttonID = interaction.customID.split("|")
+        let buttonID = interaction.customId.split("|")
 
         // Arrays of accept / denys
         let accepted = []
@@ -60,13 +60,13 @@ module.exports = async (client, interaction) => {
 
         const dissabledRow = new MessageActionRow()
             .addComponents(new MessageButton()
-                .setCustomID('STR|A|3')
+                .setCustomId('STR|A|3')
                 .setLabel('Accept')
                 .setStyle('SUCCESS')
                 .setDisabled(true));
 
         dissabledRow.addComponents(new MessageButton()
-            .setCustomID('STR|D|3')
+            .setCustomId('STR|D|3')
             .setLabel('Deny')
             .setStyle('DANGER')
             .setDisabled(true));
@@ -133,7 +133,7 @@ module.exports = async (client, interaction) => {
                 userPromise.then((user) => {
 
                     // If more then 3 people have voted for accept
-                    if (cleanAccepted.length >= 3) {
+                    if (cleanAccepted.length >= 2) {
 
                         // Edit the embed with the new description
                         editedEmbed.description = `Accepted: ${cleanAccepted.join(" ")}\nDenied: ${cleanDenied.join(" ")}\n\n**Final Consensus: Accepted!**`
@@ -172,7 +172,7 @@ module.exports = async (client, interaction) => {
 
                             usersSubteam.then(function (userData) {
 
-                                if (userData) return Error(client, "Creation", createdBy, process.env.JOIN, "ERROR HERE")
+                                if (userData) return Error(client, "Creation", createdBy, process.env.JOIN, "You already own a subteam, you must disband one to create another.")
 
                                 // Create the subteam
                                 interaction.guild.roles.create({
@@ -192,7 +192,7 @@ module.exports = async (client, interaction) => {
                                             allow: ['VIEW_CHANNEL'], //Allow permissions
                                         }],
                                         reason: `Created a channel for the subteam ${editedEmbed.fields.filter(word => word.name == "Name")[0].value} & assigned it the role and permissions based around the ${role.name} role.`,
-                                    }).then(channel => {
+                                    }).then(async channel => {
                                         channel.setParent(process.env.SUBTEAM, {
                                             lockPermissions: false
                                         })
@@ -223,13 +223,36 @@ module.exports = async (client, interaction) => {
                                         if (editedEmbed.image) subteam.banner = editedEmbed.image.url
                                         if (editedEmbed.thumbnail) subteam.thumbnail = editedEmbed.thumbnail.url
 
-                                        client.createSubteam(subteam)
+
+                                        // if (editedEmbed.fields.filter(word => word.name == "Emoji").length != 0) subteam.emoji = editedEmbed.fields.filter(word => word.name == "Emoji")[0].value
+                                        // else subteam.emoji = "<:subteams:894064421431828520>"
+                                        let emojiReg = /\.(jpeg|jpg|gif|png)$/;
+
+                                        if (editedEmbed.fields.filter(word => word.name == "Emoji").length != 0) {
+
+                                            client.guilds.cache.get(process.env.EMOJI).emojis.create((editedEmbed.fields.filter(word => word.name == "Emoji")[0].value).replace(emojiReg, 's.png'), createdBy)
+                                                .then(emoji => {
+                                                    console.log(`Created new emoji with name ${emoji.name} and added to the subteam!`)
+                                                    subteam.emoji = `<:${emoji.name}:${emoji.id}>`
+                                                    client.createSubteam(subteam)
+                                                })
+                                                .catch(e => {
+                                                    console.log(e)
+                                                    subteam.emoji = "<:subteams:894064421431828520>"
+                                                    client.createSubteam(subteam)
+
+                                                });
+                                        } else {
+                                            subteam.emoji = "<:subteams:894064421431828520>"
+                                            client.createSubteam(subteam)
+                                        }
+
 
                                     })
                                 })
                             })
                         })
-                    } else if (cleanDenied.length >= 3) {
+                    } else if (cleanDenied.length >= 2) {
 
                         // Edit the embed with the new description
                         editedEmbed.description = `Accepted: ${cleanAccepted.join(" ")}\nDenied: ${cleanDenied.join(" ")}\n\n**Final Consensus: Denied!**`
@@ -298,7 +321,7 @@ module.exports = async (client, interaction) => {
                     userPromise.then((user) => {
 
                         // If more then 3 people have voted for accept
-                        if (cleanAccepted.length >= 3) {
+                        if (cleanAccepted.length >= 2) {
 
                             // Edit the embed with the new description
                             editedEmbed.description = `Accepted: ${cleanAccepted.join(" ")}\nDenied: ${cleanDenied.join(" ")}\n\n**Final Consensus: Accepted!**`
@@ -364,6 +387,13 @@ module.exports = async (client, interaction) => {
                                         client.editSubteam(subteam[0].owner, "description", newValue[1])
 
                                         break;
+                                    case "Emoji":
+
+                                        // Just edit emoji in database
+
+                                        client.editSubteam(subteam[0].owner, "emoji", newValue[1])
+
+                                        break;
                                 }
 
                             });
@@ -387,7 +417,7 @@ module.exports = async (client, interaction) => {
                             Edited(client, createdBy, subteam[0].channel, "your request to edit your subteam was accepted! All changes have been applied and if there are any issues, feel free to contact our <@696451853478789221> bot and our <@&474034125582499840> team can provide you assistance.")
 
 
-                        } else if (cleanDenied.length >= 3) {
+                        } else if (cleanDenied.length >= 2) {
 
                             if (!subteam) return
 
@@ -431,11 +461,11 @@ module.exports = async (client, interaction) => {
 
                         const disbandRow = new MessageActionRow()
                             .addComponents(new MessageButton()
-                                .setCustomID(`STD|Y|${buttonID[2]}|${buttonID[3]}|2`)
+                                .setCustomId(`STD|Y|${buttonID[2]}|${buttonID[3]}|2`)
                                 .setLabel('Confirm Disband')
                                 .setStyle('DANGER'));
                         disbandRow.addComponents(new MessageButton()
-                            .setCustomID(`STD|N|${buttonID[2]}|${buttonID[3]}`)
+                            .setCustomId(`STD|N|${buttonID[2]}|${buttonID[3]}`)
                             .setLabel('Cancel Disband')
                             .setStyle('SUCCESS'));
 
@@ -456,12 +486,12 @@ module.exports = async (client, interaction) => {
 
                         const disbandRow = new MessageActionRow()
                             .addComponents(new MessageButton()
-                                .setCustomID(`STD|Y|${buttonID[2]}|${buttonID[3]}|2`)
+                                .setCustomId(`STD|Y|${buttonID[2]}|${buttonID[3]}|2`)
                                 .setLabel('Confirm Disband')
                                 .setDisabled(true)
                                 .setStyle('DANGER'));
                         disbandRow.addComponents(new MessageButton()
-                            .setCustomID(`STD|N|${buttonID[2]}|${buttonID[3]}`)
+                            .setCustomId(`STD|N|${buttonID[2]}|${buttonID[3]}`)
                             .setLabel('Cancel Disband')
                             .setDisabled(true)
                             .setStyle('SUCCESS'));
@@ -477,7 +507,10 @@ module.exports = async (client, interaction) => {
                             components: [disbandRow]
                         });
 
-                        await client.channels.cache.get(process.env.JOIN).send(`<@${buttonID[2]}>`, embed);
+                        await client.channels.cache.get(process.env.JOIN).send({
+                            content: `<@${buttonID[2]}>`,
+                            embeds: [embed],
+                        })
 
                         const deletedNotice = new MessageEmbed()
                             .setTitle(`Subteam Disbanded `)
@@ -503,7 +536,11 @@ module.exports = async (client, interaction) => {
 
                             })
 
-                            client.DisbandSubteam(buttonID[2]).then(interaction.channel.send("<@474034125582499840>", deletedNotice))
+                            client.DisbandSubteam(buttonID[2]).then(interaction.channel.send({
+                                content: "Subteam Disbanded",
+                                embeds: [deletedNotice],
+                            }))
+
                         })
                     }
 
@@ -548,7 +585,7 @@ module.exports = async (client, interaction) => {
                             else if (interaction.member.roles.cache.get(process.env.TIER1)) joinLimit = 4
 
                             if (numberOfSubteams >= joinLimit) return JoinError(client, buttonID[4], process.env.JOIN, `your request to join \`${buttonID[2]}\`'s Subteam was accepted. However, you are at your subteam join limit of ${joinLimit}. Please consider leaving another subteam or subscribing to our [Patreon](https://www.patreon.com/dwain).`)
-                            if (subteam.members.some(e => e.userID === buttonID[4])) return 
+                            if (subteam.members.some(e => e.userID === buttonID[4])) return
                             if (subteam.members.length == subteam.capacity) return JoinError(client, buttonID[4], process.env.JOIN, `your request to join \`${buttonID[2]}\`'s Subteam was accepted. However, the subteam is currently full. Please request to join again when there is space. You can check using \`/info (subteam)\``)
 
                             else {
@@ -576,13 +613,13 @@ module.exports = async (client, interaction) => {
 
                             const row = new MessageActionRow()
                                 .addComponents(new MessageButton()
-                                    .setCustomID(`STJR|A`)
+                                    .setCustomId(`STJR|A`)
                                     .setLabel('Accept')
                                     .setStyle('SUCCESS')
                                     .setDisabled(true));
 
                             row.addComponents(new MessageButton()
-                                .setCustomID(`STJR|D`)
+                                .setCustomId(`STJR|D`)
                                 .setLabel('Deny')
                                 .setStyle('DANGER')
                                 .setDisabled(true));
@@ -600,13 +637,13 @@ module.exports = async (client, interaction) => {
 
                     const row = new MessageActionRow()
                         .addComponents(new MessageButton()
-                            .setCustomID(`STJR|A`)
+                            .setCustomId(`STJR|A`)
                             .setLabel('Accept')
                             .setStyle('SUCCESS')
                             .setDisabled(true));
 
                     row.addComponents(new MessageButton()
-                        .setCustomID(`STJR|D`)
+                        .setCustomId(`STJR|D`)
                         .setLabel('Deny')
                         .setStyle('DANGER')
                         .setDisabled(true));
@@ -649,12 +686,12 @@ module.exports = async (client, interaction) => {
                     // Render the new page
                     const row = new MessageActionRow()
                         .addComponents(new MessageButton()
-                            .setCustomID(`STL|${goto}|L|${buttonID[3]}`)
+                            .setCustomId(`STL|${goto}|L|${buttonID[3]}`)
                             .setEmoji("⬅️")
                             .setStyle('PRIMARY'));
 
                     row.addComponents(new MessageButton()
-                        .setCustomID(`STL|${goto}|R|${buttonID[3]}`)
+                        .setCustomId(`STL|${goto}|R|${buttonID[3]}`)
                         .setEmoji("➡️")
                         .setStyle('PRIMARY'));
 
@@ -712,12 +749,12 @@ module.exports = async (client, interaction) => {
                     // Render the new page
                     const row = new MessageActionRow()
                         .addComponents(new MessageButton()
-                            .setCustomID(`STT|${goto}|L|${buttonID[3]}`)
+                            .setCustomId(`STT|${goto}|L|${buttonID[3]}`)
                             .setEmoji("⬅️")
                             .setStyle('PRIMARY'));
 
                     row.addComponents(new MessageButton()
-                        .setCustomID(`STT|${goto}|R|${buttonID[3]}`)
+                        .setCustomId(`STT|${goto}|R|${buttonID[3]}`)
                         .setEmoji("➡️")
                         .setStyle('PRIMARY'));
 
@@ -754,13 +791,13 @@ module.exports = async (client, interaction) => {
 
                     const row = new MessageActionRow()
                         .addComponents(new MessageButton()
-                            .setCustomID(`STK|A`)
+                            .setCustomId(`STK|A`)
                             .setLabel('YES')
                             .setStyle('DANGER')
                             .setDisabled(true));
 
                     row.addComponents(new MessageButton()
-                        .setCustomID(`STK|D`)
+                        .setCustomId(`STK|D`)
                         .setLabel('NO')
                         .setStyle('SUCCESS')
                         .setDisabled(true));
@@ -796,7 +833,11 @@ module.exports = async (client, interaction) => {
                             .setTitle(`Subteam Kick Notice`)
                             .setColor("#f7cba6")
                             .setDescription(`<@${buttonID[2]}>, You were kicked from a subteam.`)
-                        client.channels.cache.get(process.env.JOIN).send(`<@${buttonID[2]}>`, kicked);
+
+                        client.channels.cache.get(process.env.JOIN).send({
+                            content: `<@${buttonID[2]}>`,
+                            embeds: [kicked],
+                        })
 
 
                         roleToRemove.then((roleData) => {
@@ -811,13 +852,13 @@ module.exports = async (client, interaction) => {
 
                     const row = new MessageActionRow()
                         .addComponents(new MessageButton()
-                            .setCustomID(`STK|A`)
+                            .setCustomId(`STK|A`)
                             .setLabel('YES')
                             .setStyle('DANGER')
                             .setDisabled(true));
 
                     row.addComponents(new MessageButton()
-                        .setCustomID(`STK|D`)
+                        .setCustomId(`STK|D`)
                         .setLabel('NO')
                         .setStyle('SUCCESS')
                         .setDisabled(true));

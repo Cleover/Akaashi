@@ -28,12 +28,12 @@ exports.run = async (client, message, settings) => {
 
         const row = new MessageActionRow()
             .addComponents(new MessageButton()
-                .setCustomID(`STK|A|${userID}|${result[0].role}`)
+                .setCustomId(`STK|A|${userID}|${result[0].role}`)
                 .setLabel('YES')
                 .setStyle('DANGER'));
 
         row.addComponents(new MessageButton()
-            .setCustomID(`STK|D|${userID}|${result[0].role}`)
+            .setCustomId(`STK|D|${userID}|${result[0].role}`)
             .setLabel('NO')
             .setStyle('SUCCESS'));
 

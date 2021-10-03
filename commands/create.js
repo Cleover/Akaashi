@@ -39,19 +39,20 @@ exports.run = async (client, message, settings) => {
       }
 
       function checkURL(url) {
-        return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
+        return ((url.match(/\.(jpeg|jpg|gif|png)$/) != null) && (url.match(/imgur.com/g) != null));
       }
 
       const subteam = {
         owner: message.user.id,
-        name: settings[0].options.filter(word => word.name == "subteam-name")[0].value,
-        channel: (settings[0].options.filter(word => word.name == "channel-name")[0].value).replace(/\s+/g, '-'),
-        role: getSafe(() => (settings[0].options.filter(word => word.name == "role-name")[0].value), settings[0].options.filter(word => word.name == "subteam-name")[0].value),
-        color: getSafe(() => (settings[0].options.filter(word => word.name == "role-color")[0].value), "#95a5a6"),
-        overview: settings[0].options.filter(word => word.name == "short-description")[0].value,
-        description: settings[0].options.filter(word => word.name == "description")[0].value,
-        banner: getSafe(() => (settings[0].options.filter(word => word.name == "banner")[0].value)),
-        thumbnail: getSafe(() => (settings[0].options.filter(word => word.name == "thumbnail")[0].value)),
+        name: settings.filter(word => word.name == "subteam-name")[0].value,
+        channel: (settings.filter(word => word.name == "channel-name")[0].value).replace(/\s+/g, '-'),
+        role: getSafe(() => (settings.filter(word => word.name == "role-name")[0].value), settings.filter(word => word.name == "subteam-name")[0].value),
+        color: getSafe(() => (settings.filter(word => word.name == "role-color")[0].value), "#95a5a6"),
+        overview: settings.filter(word => word.name == "short-description")[0].value,
+        description: settings.filter(word => word.name == "description")[0].value,
+        banner: getSafe(() => (settings.filter(word => word.name == "banner")[0].value)),
+        thumbnail: getSafe(() => (settings.filter(word => word.name == "thumbnail")[0].value)),
+        emoji: getSafe(() => (settings.filter(word => word.name == "emoji")[0].value)),
       }
 
       // Check the role
@@ -73,12 +74,12 @@ exports.run = async (client, message, settings) => {
 
       const row = new MessageActionRow()
         .addComponents(new MessageButton()
-          .setCustomID('STR|A|3')
+          .setCustomId('STR|A|3')
           .setLabel('Accept')
           .setStyle('SUCCESS'));
 
       row.addComponents(new MessageButton()
-        .setCustomID('STR|D|3')
+        .setCustomId('STR|D|3')
         .setLabel('Deny')
         .setStyle('DANGER'));
 
@@ -96,19 +97,26 @@ exports.run = async (client, message, settings) => {
 
       if (subteam.banner)
         if (checkURL(subteam.banner)) embed.setImage(subteam.banner)
-      else return message.reply("Your banner image is incorrect, please make sure it is either a image or a gif")
+      else return message.reply("Your banner image is incorrect, please make sure it is either a image or a gif and is a link from imgur")
 
       if (subteam.thumbnail)
         if (checkURL(subteam.thumbnail)) embed.setThumbnail(subteam.thumbnail)
-      else return message.reply("Your thumbnail image is incorrect, please make sure it is either a image or a gif")
+      else return message.reply("Your thumbnail image is incorrect, please make sure it is either a image or a gif and is a link from imgur")
 
+      if (subteam.emoji)
+        if (checkURL(subteam.emoji)) embed.addField("Emoji", `${subteam.emoji}`, true)
+      else return message.reply("Your emoji image is incorrect, please make sure it is either a image or a gif and is a link from imgur")
 
       // console.log(embed)
 
-      client.channels.cache.get(process.env.STAFF).send(`<@&${process.env.PING}>`, {
-        embed,
+      client.channels.cache.get(process.env.STAFF).send({
+        // content: `<@&${process.env.PING}>`, 
+        embeds: [embed],
         components: [row]
       });
+
+      // ephemeral: true 
+
       message.reply("This process will change in the future.\nCreating Subteam...")
       // client.createSubteam(subteam)
     })

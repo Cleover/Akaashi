@@ -3,6 +3,11 @@ const {
     Subteam,
 } = require('../models');
 
+const {
+    SlashCommandBuilder
+} = require('@discordjs/builders');
+
+
 module.exports = client => {
 
     client.createSubteam = async (settings) => {
@@ -135,11 +140,7 @@ module.exports = client => {
             if (result) {
                 result.forEach(element => {
                     if (arr.length != 25) {
-                        let subteamData = {
-                            name: element.name,
-                            value: element.owner
-                        }
-                        arr.push(subteamData)
+                        arr.push([element.name, element.owner])
                     }
                 });
             }
@@ -151,211 +152,96 @@ module.exports = client => {
                 })
             })
 
-            const data = {
-                name: "subteam",
-                description: "Subteam Commands",
-                options: [{
-                        name: "create",
-                        description: "Create A Subteam (Requires Teir 2 Or Tier 3 on Patron)",
-                        type: 1,
-                        options: [{
-                                name: "subteam-name",
-                                description: "What's the name of the subteam your making?",
-                                type: 3,
-                                required: true
-                            },
-                            {
-                                name: "channel-name",
-                                description: "What's the name of the channel that will host your subteam?",
-                                type: 3,
-                                required: true
-                            },
-                            {
-                                name: "short-description",
-                                description: "What is a short description for your subteam? (shown on the `/subteam list`)",
-                                type: 3,
-                                required: true
-                            },
-                            {
-                                name: "description",
-                                description: "What is a long description for your subteam (shown on `/subteam info your_subteam_name`)",
-                                type: 3,
-                                required: true
-                            },
-                            {
-                                name: "role-name",
-                                description: "What's the name of the role for your subteam?",
-                                type: 3,
-                                required: false
-                            },
-                            {
-                                name: "role-color",
-                                description: "What's the color of the role for your subteam? (Must be in a #HEX_CODE format)",
-                                type: 3,
-                                required: false
-                            },
-                            {
-                                name: "banner",
-                                description: "A Imgur Link to a image/gif for your subteam banner (shown below subteam info on `/subteam info`)",
-                                type: 3,
-                                required: false
-                            },
-                            {
-                                name: "thumbnail",
-                                description: "A Imgur Link to a image/gif for your subteam thumbnail (Shown in top right of subteam info embed)",
-                                type: 3,
-                                required: false
-                            },
-                        ]
-                    },
-                    {
-                        name: "edit",
-                        description: "Edits Your Subteam (Requires you to own a subteam)",
-                        type: 1,
-                        options: [{
-                                name: "subteam-name",
-                                description: "What's the name of the subteam your making?",
-                                type: 3,
-                                required: false
-                            },
-                            {
-                                name: "channel-name",
-                                description: "What's the name of the channel that will host your subteam?",
-                                type: 3,
-                                required: false
-                            },
-                            {
-                                name: "role-name",
-                                description: "What's the name of the role for your subteam?",
-                                type: 3,
-                                required: false
-                            },
-                            {
-                                name: "role-color",
-                                description: "What's the color of the role for your subteam? (Must be in a #HEX_CODE format)",
-                                type: 3,
-                                required: false
-                            },
-                            {
-                                name: "short-description",
-                                description: "What is a short description for your subteam? (shown on the `/subteam list`)",
-                                type: 3,
-                                required: false
-                            },
-                            {
-                                name: "description",
-                                description: "What is a long description for your subteam (shown on `/subteam info your_subteam_name`)",
-                                type: 3,
-                                required: false
-                            },
-                            {
-                                name: "banner",
-                                description: "A Imgur Link to a image/gif for your subteam banner (shown below subteam info on `/subteam info`)",
-                                type: 3,
-                                required: false
-                            },
-                            {
-                                name: "thumbnail",
-                                description: "A Imgur Link to a image/gif for your subteam thumbnail (Shown in top right of subteam info embed)",
-                                type: 3,
-                                required: false
-                            },
-                        ]
-                    }, {
-                        name: "kick",
-                        description: "Kick A user from a subteam you own",
-                        type: 1,
-                        options: [{
-                            name: "user",
-                            description: "Which user would you like to Kick? Start typing to filter list",
-                            type: 6,
-                            required: true,
-                        }, ]
-                    },
-                    {
-                        name: "disband",
-                        description: "Deletes Your Subteam (Requires you to own a subteam). There will be conformation after this is run",
-                        type: 1,
-                    },
-                    {
-                        name: "join",
-                        description: "Join A existing subteam",
-                        type: 1,
-                        options: [{
-                                name: "subteam",
-                                description: "Which subteam would you like to join? Start typing to filter list",
-                                type: 3,
-                                required: true,
-                                choices: arr
-                            },
-                            {
-                                name: "message",
-                                description: "Message to be sent along with your application, this can be used to answer questions, etc",
-                                type: 3,
-                                required: false
-                            },
-                        ]
-                    }, {
-                        name: "leave",
-                        description: "Leave a subteam your a part of",
-                        type: 1,
-                        options: [{
-                            name: "subteam",
-                            description: "Which subteam would you like to leave? Start typing to filter list (This will list all subteams)",
-                            type: 3,
-                            required: true,
-                            choices: arr
-                        }]
-                    },
-                    {
-                        name: "list",
-                        description: "List all currently active subteams",
-                        type: 1,
-                    },
-                    {
-                        name: "leaderboard",
-                        description: "List the top subteams",
-                        type: 1,
-                    },
-                    {
-                        name: "info",
-                        description: "Get more info on a specific subteam from the subteam list command",
-                        type: 1,
-                        options: [{
-                            name: "subteam",
-                            description: "Which subteam would you like to join? Start typing to filter list",
-                            type: 3,
-                            required: true,
-                            choices: arr
-                        }, ]
-                    },
-                    {
-                        name: "help",
-                        description: "Get more info on the commands",
-                        type: 1,
-                        options: [{
-                            name: "command",
-                            description: "Which command do you need help with?",
-                            type: 3,
-                            required: false,
-                            choices: helpArr
-                        }, ]
-                    },
-                    {
-                        name: "test",
-                        description: "Example join command",
-                        type: 1,
-                        options: [{
-                            name: "owner",
-                            description: "What is the owner of the subteam you would like to join?",
-                            type: 6,
-                            required: true,
-                        }, ]
-                    },
-                ]
-            }
+            const command = (new SlashCommandBuilder()
 
-            const command = client.guilds.cache.get(process.env.DISCORD)?.commands.create(data);
+                // Main command
+                .setName('subteam')
+                .setDescription('Subteam Commands')
+
+                // Subcommands
+
+                // Create
+                .addSubcommand(subcommand =>
+                    subcommand
+                    .setName('create')
+                    .setDescription('Create A Subteam (Requires Teir 2 Or Tier 3 on Patron)')
+
+                    // Required
+                    .addStringOption(option => option.setName('subteam-name').setDescription("What's the name of the subteam your making?").setRequired(true))
+                    .addStringOption(option => option.setName('channel-name').setDescription("What's the name of the channel that will host your subteam?").setRequired(true))
+                    .addStringOption(option => option.setName('short-description').setDescription("What is a short description for your subteam? (shown on the `/subteam list`)").setRequired(true))
+                    .addStringOption(option => option.setName('description').setDescription("What is a long description for your subteam (shown on `/subteam info your_subteam_name`)").setRequired(true))
+
+                    // Not Required
+                    .addStringOption(option => option.setName('role-name').setDescription("What's the name of the role for your subteam?").setRequired(false))
+                    .addStringOption(option => option.setName('role-color').setDescription("What's the color of the role for your subteam? (Must be in a #HEX_CODE format)").setRequired(false))
+                    .addStringOption(option => option.setName('banner').setDescription("A Imgur Link to a image/gif for your subteam banner (shown below subteam info on `/subteam info`)").setRequired(false))
+                    .addStringOption(option => option.setName('thumbnail').setDescription("A Imgur Link to a image/gif for your subteam thumbnail (Shown in top right of subteam info embed)").setRequired(false))
+                    .addStringOption(option => option.setName('emoji').setDescription("A Imgur Link to a image/gif for your subteam emoji").setRequired(false))
+                )
+
+                // Edit
+                .addSubcommand(subcommand =>
+                    subcommand
+                    .setName('edit')
+                    .setDescription('Create A Subteam (Requires Teir 2 Or Tier 3 on Patron)')
+
+                    // Not Required
+                    .addStringOption(option => option.setName('subteam-name').setDescription("What's the name of the subteam your making?").setRequired(false))
+                    .addStringOption(option => option.setName('channel-name').setDescription("What's the name of the channel that will host your subteam?").setRequired(false))
+                    .addStringOption(option => option.setName('short-description').setDescription("What is a short description for your subteam? (shown on the `/subteam list`)").setRequired(false))
+                    .addStringOption(option => option.setName('description').setDescription("What is a long description for your subteam (shown on `/subteam info your_subteam_name`)").setRequired(false))
+                    .addStringOption(option => option.setName('role-name').setDescription("What's the name of the role for your subteam?").setRequired(false))
+                    .addStringOption(option => option.setName('role-color').setDescription("What's the color of the role for your subteam? (Must be in a #HEX_CODE format)").setRequired(false))
+                    .addStringOption(option => option.setName('banner').setDescription("A Imgur Link to a image/gif for your subteam banner (shown below subteam info on `/subteam info`)").setRequired(false))
+                    .addStringOption(option => option.setName('thumbnail').setDescription("A Imgur Link to a image/gif for your subteam thumbnail (Shown in top right of subteam info embed)").setRequired(false))
+                    .addStringOption(option => option.setName('emoji').setDescription("A Imgur Link to a image/gif for your subteam emoji").setRequired(false))
+                )
+
+                // Kick
+                .addSubcommand(subcommand =>
+                    subcommand
+                    .setName('kick')
+                    .setDescription('Kick A user from a subteam you own')
+
+                    // Required
+                    .addUserOption(option => option.setName('user').setDescription("Which user would you like to Kick? Start typing to filter list").setRequired(true))
+                )
+
+                // Disband
+                .addSubcommand(subcommand =>
+                    subcommand
+                    .setName('disband')
+                    .setDescription('Deletes Your Subteam (Requires you to own a subteam). There will be conformation after this is run')
+                )
+
+                // Join
+                .addSubcommand(subcommand =>
+                    subcommand
+                    .setName('join')
+                    .setDescription('Join A existing subteam')
+
+                    // Required
+                    // .addStringOption(option => option.setName('subteam').setDescription("Which subteam would you like to join? Start typing to filter list").addChoices(arr).setRequired(true))
+
+                    // Not Required
+                    // .addStringOption(option => option.setName('message').setDescription("Message to be sent along with your application, this can be used to answer questions, etc").setRequired(false))
+                )
+
+                // // Leave
+                // .addSubcommand(subcommand =>
+                //     subcommand
+                //     .setName('leave')
+                //     .setDescription('Join A existing subteam')
+
+                //     // Required
+                //     .addStringOption(option => option.setName('subteam').setDescription("Which subteam would you like to leave? Start typing to filter list (This will list all subteams)").addChoices(arr).setRequired(true))
+                // )
+
+            ).toJSON()
+
+
+            const createCommand = client.guilds.cache.get(process.env.GUILD)?.commands.create(command);
         })
 
 

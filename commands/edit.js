@@ -9,7 +9,7 @@ exports.run = async (client, message, settings) => {
     let usersSubteam = client.getSubteamByUser(message.user.id)
 
     function checkURL(url) {
-        return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
+        return ((url.match(/\.(jpeg|jpg|gif|png)$/) != null) && (url.match(/imgur.com/g) != null));
     }
 
     usersSubteam.then(function (userData) {
@@ -18,16 +18,16 @@ exports.run = async (client, message, settings) => {
 
         if (!userData) return message.reply("You do not own a subteam!")
 
-        if(!settings[0].options) return message.reply("You must provide values to edit!")
+        if (!settings) return message.reply("You must provide values to edit!")
 
         const row = new MessageActionRow()
             .addComponents(new MessageButton()
-                .setCustomID('STE|A|3')
+                .setCustomId('STE|A|3')
                 .setLabel('Accept')
                 .setStyle('SUCCESS'));
 
         row.addComponents(new MessageButton()
-            .setCustomID('STE|D|3')
+            .setCustomId('STE|D|3')
             .setLabel('Deny')
             .setStyle('DANGER'));
 
@@ -39,7 +39,7 @@ exports.run = async (client, message, settings) => {
             .addField("Owner", `<@${message.user.id}>`, true)
             .setFooter(`Application Sent By | ${message.user.id}`)
 
-        settings[0].options.forEach(element => {
+        settings.forEach(element => {
 
             switch (element.name) {
                 case "subteam-name":
@@ -52,7 +52,7 @@ exports.run = async (client, message, settings) => {
                     break;
                 case "channel-name":
 
-                let channel = element.value.replace(/\s+/g, '-')
+                    let channel = element.value.replace(/\s+/g, '-')
 
                     if (element.value.length > 20) {
                         message.reply("Sorry your channel name is too long, it must be under 20 characters.")
@@ -103,19 +103,27 @@ exports.run = async (client, message, settings) => {
 
                     if (checkURL(element.value)) embed.setImage(element.value)
                     else {
-                        message.reply("Your banner image is incorrect, please make sure it is either a image or a gif")
+                        message.reply("Your banner image is incorrect, please make sure it is either a image or a gif and is a link from imgur")
                         failed = true
                     }
-
-
 
                     break;
                 case "thumbnail":
                     if (checkURL(element.value)) embed.setThumbnail(element.value)
                     else {
-                        message.reply("Your thumbnail image is incorrect, please make sure it is either a image or a gif")
+                        message.reply("Your thumbnail image is incorrect, please make sure it is either a image or a gif and is a link from imgur")
                         failed = true
                     }
+                    break;
+
+                case "emoji":
+
+                    if (checkURL(element.value)) embed.addField("Emoji", `${userData[0].emoji} / ${element.value}`, true)
+                    else {
+                        message.reply("Your thumbnail image is incorrect, please make sure it is either a image or a gif and is a link from imgur")
+                        failed = true
+                    }
+                    
                     break;
                 default:
                     console.log("Cleo you messed something up")
@@ -124,12 +132,15 @@ exports.run = async (client, message, settings) => {
 
         });
 
-        if(failed) return
+        if (failed) return
 
-        client.channels.cache.get(process.env.STAFF).send(`<@&${process.env.PING}>`, {
-            embed,
+        client.channels.cache.get(process.env.STAFF).send({
+            // content: `<@&${process.env.PING}>`, 
+            embeds: [embed],
             components: [row]
         });
+
+        // ephemeral: true 
         message.reply("This process will change in the future.\nSending Edit Request")
 
     })

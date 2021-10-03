@@ -8,12 +8,12 @@ exports.run = async (client, message, settings) => {
 
     const row = new MessageActionRow()
         .addComponents(new MessageButton()
-            .setCustomID(`STT|1|L|${message.user.id}`)
+            .setCustomId(`STT|1|L|${message.user.id}`)
             .setEmoji("⬅️")
             .setStyle('PRIMARY'));
 
     row.addComponents(new MessageButton()
-        .setCustomID(`STT|1|R|${message.user.id}`)
+        .setCustomId(`STT|1|R|${message.user.id}`)
         .setEmoji("➡️")
         .setStyle('PRIMARY'));
 

@@ -22,6 +22,7 @@ const subteamSchema = mongoose.Schema({
     // Not Required
     banner: { type: String, require: false },
     thumbnail: { type: String, require: false },
+    emoji: { type: String, require: false },
 
 });
 
