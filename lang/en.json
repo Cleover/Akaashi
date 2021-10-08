@@ -1,0 +1,33 @@
+{
+
+    "missing_setup_requirements": "A admin must first run `/setup` to fill out bots configuration", 
+    "role_name_too_long": "Sorry your role name is too long, it must be under 20 characters.",
+    "channel_name_too_long": "Sorry your channel name is too long, it must be under 20 characters.",
+    
+    "subteam_name_too_long": "Sorry your subteam name is too long, it must be under 40 characters.",
+    "subteam_overview_too_long": "Sorry your subteam overview is too long, it must be under 256 characters.",
+    "subteam_description_too_long": "Sorry your subteam description is too long, it must be under 1000 characters.",
+
+    "role_name_unallowed_characters": "You role name can only contain (A-Z), (a-z), (0-9), and emojis.",
+    "channel_name_unallowed_characters": "You channel name can only contain (A-Z), (a-z), (0-9), (-), and emojis.",
+    "role_hex_mismatch": "Your color does not match the requirements of being a hex code",
+
+    "subteam_banner_image_incorrect": "Your banner image is incorrect, please make sure it is either a image or a gif and is a link from imgur",
+    "subteam_thumbnail_image_incorrect": "Your banner image is incorrect, please make sure it is either a image or a gif and is a link from imgur",
+    "subteam_emoji_image_incorrect": "Your emoji image is incorrect, please make sure it is either a image or a gif and is a link from imgur",
+    "subteam_emoji_image_too_large": "Your emoji is too large, it must be less than 256kb. Currently:",
+
+    "subteam_creation": "This process will change in the future.\nCreating Subteam...",
+
+
+
+    "accept_deny_channel_not_channel": "The Accept/Deny channel you have selected is not a channel, please choose a channel. You may have selected a category (Has a folder icon beside the name instead of a #)",
+    "notify_channel_not_channel": "The Notify channel you have selected is not a channel, please choose a channel. You may have selected a category (Has a folder icon beside the name instead of a #)",
+
+    "subteam_category_not_category": "The Subteam category you have selected is not a category, please choose a category. You may have selected a channel (Has a # beside the name instead of a folder icon)",
+
+    "vote_requirements_invalid": "The supplied vote requirements are invalid, please make sure the value is between 0 and 99 (0 to skip voting and have all subteam requests automatically accepted)",
+
+    "emoji_server_id_invalid": "The supplied emoji server ID is invalid, make sure I am added to the server, and have admin permissions"
+
+}

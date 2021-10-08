@@ -15,25 +15,34 @@ const {
     JoinError,
 } = require('../handlers/embed');
 
+require('../utils/safe.js')();
 
 module.exports = async (client, interaction) => {
 
-    function cleanArray(actual) {
-        var newArray = new Array();
-        for (var i = 0; i < actual.length; i++) {
-            if (actual[i]) {
-                newArray.push(actual[i]);
-            }
-        }
-        return newArray;
-    }
+    let guildSettings = await client.getGuildData(interaction.guild.id)
+    let userSettings = await client.getUserInGuild(interaction.guild.id, interaction.user.id)
 
     // Check if its a command 
     if (interaction.isCommand()) {
 
+        // Update again after the guilds been created
+        guildSettings = await client.getGuildData(interaction.guild.id)
+
         const cmd = client.commands.get(`${interaction.options._subcommand}`)
         if (!cmd) return;
-        cmd.run(client, interaction, interaction.options._hoistedOptions);
+
+        let userLang;
+
+        try {
+            userLang = require(`../lang/${userSettings.lang}.json`)
+        } catch {
+            userLang = require(`../lang/en.json`)
+            console.log(`Couldn't find "${userSettings.lang}.json," using en.json as default`)
+        }
+
+        if (guildSettings.settings == "{}" && interaction.options._subcommand != "setup") return interaction.reply(userLang.missing_setup_requirements)
+        else cmd.run(client, interaction, interaction.options._hoistedOptions, guildSettings, userSettings, userLang);
+
     }
 
     // Check if its a button
@@ -48,6 +57,7 @@ module.exports = async (client, interaction) => {
 
         // Original embed description
         let descriptionWithIds;
+
         if (buttonID[0] != "STD" && buttonID[0] != "STL" && buttonID[0] != "STK") descriptionWithIds = cleanArray(interaction.message.embeds[0].description.replace(/[^0-9\s-<@>]/g, '').split("\n"))
 
         // Set the accepted / deny arrays if we have them
@@ -133,7 +143,7 @@ module.exports = async (client, interaction) => {
                 userPromise.then((user) => {
 
                     // If more then 3 people have voted for accept
-                    if (cleanAccepted.length >= 2) {
+                    if (cleanAccepted.length >= process.env.REQUIRE) {
 
                         // Edit the embed with the new description
                         editedEmbed.description = `Accepted: ${cleanAccepted.join(" ")}\nDenied: ${cleanDenied.join(" ")}\n\n**Final Consensus: Accepted!**`
@@ -230,7 +240,7 @@ module.exports = async (client, interaction) => {
 
                                         if (editedEmbed.fields.filter(word => word.name == "Emoji").length != 0) {
 
-                                            client.guilds.cache.get(process.env.EMOJI).emojis.create((editedEmbed.fields.filter(word => word.name == "Emoji")[0].value).replace(emojiReg, 's.png'), createdBy)
+                                            client.guilds.cache.get(process.env.EMOJI).emojis.create((editedEmbed.fields.filter(word => word.name == "Emoji")[0].value), createdBy)
                                                 .then(emoji => {
                                                     console.log(`Created new emoji with name ${emoji.name} and added to the subteam!`)
                                                     subteam.emoji = `<:${emoji.name}:${emoji.id}>`
@@ -252,7 +262,7 @@ module.exports = async (client, interaction) => {
                                 })
                             })
                         })
-                    } else if (cleanDenied.length >= 2) {
+                    } else if (cleanDenied.length >= process.env.REQUIRE) {
 
                         // Edit the embed with the new description
                         editedEmbed.description = `Accepted: ${cleanAccepted.join(" ")}\nDenied: ${cleanDenied.join(" ")}\n\n**Final Consensus: Denied!**`
@@ -321,7 +331,7 @@ module.exports = async (client, interaction) => {
                     userPromise.then((user) => {
 
                         // If more then 3 people have voted for accept
-                        if (cleanAccepted.length >= 2) {
+                        if (cleanAccepted.length >= process.env.REQUIRE) {
 
                             // Edit the embed with the new description
                             editedEmbed.description = `Accepted: ${cleanAccepted.join(" ")}\nDenied: ${cleanDenied.join(" ")}\n\n**Final Consensus: Accepted!**`
@@ -417,7 +427,7 @@ module.exports = async (client, interaction) => {
                             Edited(client, createdBy, subteam[0].channel, "your request to edit your subteam was accepted! All changes have been applied and if there are any issues, feel free to contact our <@696451853478789221> bot and our <@&474034125582499840> team can provide you assistance.")
 
 
-                        } else if (cleanDenied.length >= 2) {
+                        } else if (cleanDenied.length >= process.env.REQUIRE) {
 
                             if (!subteam) return
 

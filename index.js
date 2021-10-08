@@ -1,17 +1,12 @@
 const fs = require("fs");
 const Discord = require('discord.js');
 
-// const client = new Discord.Client({
-//   intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_MESSAGES', 'GUILD_MEMBERS', 'GUILD_MESSAGE_REACTIONS', 'DIRECT_MESSAGES'],
-//   partials: ['MESSAGE', 'CHANNEL', 'REACTION']
-// });
-
 const client = new Discord.Client({
   intents: ['GUILDS'],
 });
 
-
 require('./utils/functions')(client);
+
 require("dotenv").config()
 
 client.mongoose = require('./utils/mongoose');

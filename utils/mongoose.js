@@ -7,7 +7,8 @@ module.exports = {
             autoIndex: false,
             poolSize: 5,
             connectTimeoutMS: 10000,
-            family: 4
+            family: 4,
+            useUnifiedTopology: true
         };
         const uri = process.env.MONGODB;
         mongoose.connect(uri, dbOptions).catch(err => console.log(err.reason));

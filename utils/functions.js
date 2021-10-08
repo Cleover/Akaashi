@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const {
     Subteam,
+    User,
+    Guild,
 } = require('../models');
 
 const {
@@ -9,6 +11,25 @@ const {
 
 
 module.exports = client => {
+
+    client.createGuild = async (settings) => {
+        let merged = Object.assign(settings);
+        const newGuild = await new Guild(merged);
+        return newGuild.save()
+    };
+
+    client.getGuildData = async (guildID) => {
+        let data = await Guild.findOne({
+            id: guildID
+        });
+        if (data) return data;
+        else {
+            console.log("No Guild Found. Creating Guild instead...")
+            return await client.createGuild({
+                "id": guildID
+            })
+        }
+    };
 
     client.createSubteam = async (settings) => {
         let merged = Object.assign(settings);
@@ -23,12 +44,47 @@ module.exports = client => {
         });
     };
 
+    client.createUser = async (settings) => {
+        let merged = Object.assign(settings);
+        const newUser = await new User(merged);
+        return newUser.save()
+    };
+
     client.getSubteamByUser = async (userID) => {
         let data = await Subteam.find({
             owner: userID
         });
         if (data.length > 0) return data;
         else return console.log(`No Subteams Found`)
+    };
+
+    client.getUserInGuild = async (guildID, userID) => {
+        let data = await User.findOne({
+            id: userID,
+            guild: guildID
+        });
+        if (data) return data;
+        else {
+            console.log(`No User Found. Creating User ${userID}...`)
+            let user = await client.createUser({
+                "id": userID,
+                "guild": guildID
+            })
+            Guild.findOneAndUpdate({
+                    id: guildID
+                }, {
+                    $push: {
+                        users: user._id
+                    }
+                },
+                function (error, success) {
+                    if (error) console.log(error);
+                    else {
+                        console.log(`Created user:${userID}, and added them to guild:${guildID}"`);
+                    }
+                });
+            return user
+        }
     };
 
     client.getSubteamByChannel = async (channelID) => {
@@ -228,6 +284,28 @@ module.exports = client => {
                     // .addStringOption(option => option.setName('message').setDescription("Message to be sent along with your application, this can be used to answer questions, etc").setRequired(false))
                 )
 
+                // setup
+                .addSubcommand(subcommand =>
+                    subcommand
+                    .setName('setup')
+                    .setDescription('Setup the bot!~')
+
+                    // Required
+
+                    // Channel
+                    .addChannelOption(option => option.setName('accept-deny-channel').setDescription("What channel should be used for sending the subteam edit/creation requests to be accepted/denied?").setRequired(true))
+                    .addChannelOption(option => option.setName('notify-channel').setDescription("What channel should be used for sending the subteam notifications? (ie: when a subteam is disbanded)").setRequired(true))
+                    
+                    // Category
+                    .addChannelOption(option => option.setName('subteam-category').setDescription("What category should be used for the created subteams?)").setRequired(true))
+                    
+                    // Integer 
+                    .addIntegerOption(option => option.setName('vote-requirements').setDescription("How many votes should be required to accept/deny a subteam request?").setRequired(true))
+
+                    // Not Required
+                    .addStringOption(option => option.setName('emoji-server-id').setDescription("What is the id of the emoji server? (Not required to function)").setRequired(false))
+                )
+
                 // // Leave
                 // .addSubcommand(subcommand =>
                 //     subcommand
@@ -240,8 +318,7 @@ module.exports = client => {
 
             ).toJSON()
 
-
-            const createCommand = client.guilds.cache.get(process.env.GUILD)?.commands.create(command);
+            const createCommand = client.guilds.cache.get("697607643715338261").commands.create(command);
         })
 
 
